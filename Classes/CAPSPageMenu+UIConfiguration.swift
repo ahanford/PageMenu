@@ -60,6 +60,16 @@ extension CAPSPageMenu {
                 configuration.centerMenuItems = value
             case let .hideTopMenuBar(value):
                 configuration.hideTopMenuBar = value
+            case let .searchBarBackgroundColor(value):
+                configuration.searchBarBackgroundColor = value
+            case let .searchBarTintColor(value):
+                configuration.searchBarTintColor = value
+            case let .searchBarBarTintColor(value):
+                configuration.searchBarBarTintColor = value
+            case let .searchBarDelegate(value):
+                configuration.searchBarDelegate = value
+            case let .searchBarPlaceholderText(value):
+                 configuration.searchBarPlaceholderText = value
             }
         }
         
@@ -68,9 +78,10 @@ extension CAPSPageMenu {
             configuration.menuHeight = 0.0
         }
     }
-    
+
+
     func setUpUserInterface() {
-        let viewsDictionary = ["menuScrollView":menuScrollView, "controllerScrollView":controllerScrollView]
+        let viewsDictionary = ["menuScrollView":menuScrollView, "controllerScrollView":controllerScrollView, "searchBar": searchBar] as [String : Any]
         
         // Set up controller scroll view
         controllerScrollView.isPagingEnabled = true
@@ -78,26 +89,49 @@ extension CAPSPageMenu {
         controllerScrollView.alwaysBounceHorizontal = configuration.enableHorizontalBounce
         controllerScrollView.bounces = configuration.enableHorizontalBounce
         
-        controllerScrollView.frame = CGRect(x: 0.0, y: configuration.menuHeight, width: self.view.frame.width, height: self.view.frame.height)
+        controllerScrollView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.width, height: self.view.frame.height)
         
         self.view.addSubview(controllerScrollView)
         
         let controllerScrollView_constraint_H:Array = NSLayoutConstraint.constraints(withVisualFormat: "H:|[controllerScrollView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
         let controllerScrollView_constraint_V:Array = NSLayoutConstraint.constraints(withVisualFormat: "V:|[controllerScrollView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
-        
+
+        // grap top constraint - we'll be animating this later
+        for constraint in controllerScrollView_constraint_V {
+            if (constraint as NSLayoutConstraint).firstAttribute == NSLayoutAttribute.top {
+                controllerViewYConstraint = constraint
+            }
+        }
+
         self.view.addConstraints(controllerScrollView_constraint_H)
         self.view.addConstraints(controllerScrollView_constraint_V)
-        
+
+        // Hack in search bar.
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.backgroundColor = configuration.searchBarBackgroundColor
+        searchBar.tintColor = configuration.searchBarTintColor
+        searchBar.barTintColor = configuration.searchBarBarTintColor
+        searchBar.delegate = configuration.searchBarDelegate
+        searchBar.placeholder = configuration.searchBarPlaceholderText
+        searchBarHeightConstraint = NSLayoutConstraint(item: searchBar, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0)
+
+        self.view.addSubview(searchBar)
+        self.view.addConstraint(searchBarHeightConstraint!)
+
+
         // Set up menu scroll view
         menuScrollView.translatesAutoresizingMaskIntoConstraints = false
         
         menuScrollView.frame = CGRect(x: 0.0, y: 0.0, width: self.view.frame.width, height: configuration.menuHeight)
         
         self.view.addSubview(menuScrollView)
+
+        let searchBarScrollBar_constraint_H: Array = NSLayoutConstraint.constraints(withVisualFormat: "H:|[searchBar]|", metrics: nil, views: viewsDictionary)
         
         let menuScrollView_constraint_H:Array = NSLayoutConstraint.constraints(withVisualFormat: "H:|[menuScrollView]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
-        let menuScrollView_constraint_V:Array = NSLayoutConstraint.constraints(withVisualFormat: "V:[menuScrollView(\(configuration.menuHeight))]", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
-        
+        let menuScrollView_constraint_V:Array = NSLayoutConstraint.constraints(withVisualFormat: "V:|[searchBar]-0-[menuScrollView(\(configuration.menuHeight))]", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: viewsDictionary)
+
+        self.view.addConstraints(searchBarScrollBar_constraint_H)
         self.view.addConstraints(menuScrollView_constraint_H)
         self.view.addConstraints(menuScrollView_constraint_V)
         
@@ -110,7 +144,7 @@ extension CAPSPageMenu {
             self.view.addSubview(menuBottomHairline)
             
             let menuBottomHairline_constraint_H:Array = NSLayoutConstraint.constraints(withVisualFormat: "H:|[menuBottomHairline]|", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["menuBottomHairline":menuBottomHairline])
-            let menuBottomHairline_constraint_V:Array = NSLayoutConstraint.constraints(withVisualFormat: "V:|-\(configuration.menuHeight)-[menuBottomHairline(0.5)]", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["menuBottomHairline":menuBottomHairline])
+            let menuBottomHairline_constraint_V:Array = NSLayoutConstraint.constraints(withVisualFormat: "V:[menuScrollView][menuBottomHairline(0.5)]", options: NSLayoutFormatOptions(rawValue: 0), metrics: nil, views: ["menuBottomHairline":menuBottomHairline, "menuScrollView":menuScrollView])
             
             self.view.addConstraints(menuBottomHairline_constraint_H)
             self.view.addConstraints(menuBottomHairline_constraint_V)

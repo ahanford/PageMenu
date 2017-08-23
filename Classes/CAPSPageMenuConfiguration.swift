@@ -34,6 +34,12 @@ public class CAPSPageMenuConfiguration {
     open var centerMenuItems : Bool = false
     open var enableHorizontalBounce : Bool = true
     open var hideTopMenuBar : Bool = false
+    open var searchBarBackgroundColor : UIColor = UIColor.lightGray
+    open var searchBarTintColor : UIColor = UIColor.white
+    open var searchBarBarTintColor : UIColor = UIColor.lightGray
+    open var searchBarDelegate : UISearchBarDelegate? = nil
+    open var searchBarPlaceholderText : String = "Search"
+
     
     public init() {
         

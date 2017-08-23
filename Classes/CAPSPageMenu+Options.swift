@@ -44,4 +44,9 @@ public enum CAPSPageMenuOption {
     case scrollAnimationDurationOnMenuItemTap(Int)
     case centerMenuItems(Bool)
     case hideTopMenuBar(Bool)
+    case searchBarBackgroundColor(UIColor)
+    case searchBarTintColor(UIColor)
+    case searchBarBarTintColor(UIColor)
+    case searchBarDelegate(UISearchBarDelegate)
+    case searchBarPlaceholderText(String)
 }

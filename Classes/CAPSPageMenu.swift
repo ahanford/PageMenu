@@ -38,6 +38,17 @@ open class CAPSPageMenu: UIViewController {
     var controllerArray : [UIViewController] = []
     public var menuItems : [MenuItemView] = []
     var menuItemWidths : [CGFloat] = []
+
+    // search bar
+    public var searchBar: UISearchBar = {
+        let bar = UISearchBar()
+        bar.isHidden = true
+        bar.backgroundImage = UIImage()
+
+        return bar
+    }()
+    public var searchBarHeightConstraint: NSLayoutConstraint?
+    public var controllerViewYConstraint: NSLayoutConstraint?
     
     var totalMenuItemWidthIfDifferentWidths : CGFloat = 0.0
     
@@ -361,4 +372,33 @@ extension CAPSPageMenu {
             })
         }
     }
+
+    open func showSearchBar(){
+        if let topConstraint = controllerViewYConstraint {
+            if let searchConstraint = searchBarHeightConstraint {
+
+                if self.searchBar.isHidden {
+                    view.bringSubview(toFront: self.searchBar)
+                    self.searchBar.isHidden = false
+                    UIView.animate(withDuration: 0.3, animations: {
+                        searchConstraint.constant = 44
+                        topConstraint.constant = topConstraint.constant + 44
+                        self.view.layoutIfNeeded()
+                    }){ _ in self.controllerScrollView.bounces = false; self.controllerScrollView.alwaysBounceHorizontal = false; self.controllerScrollView.alwaysBounceVertical = false }
+                } else {
+                    UIView.animate(withDuration: 0.3, animations: {
+                        searchConstraint.constant = 0
+                        topConstraint.constant = topConstraint.constant - 44
+                        self.view.layoutIfNeeded()
+                    }) { _ in self.searchBar.isHidden = true }
+                }
+
+            }
+        }
+    }
+
+    open func getSelectedController() -> UIViewController {
+        return controllerArray[currentPageIndex]
+    }
+
 }
