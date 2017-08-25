@@ -377,7 +377,7 @@ extension CAPSPageMenu {
         if let topConstraint = controllerViewYConstraint {
             if let searchConstraint = searchBarHeightConstraint {
 
-                if self.searchBar.isHidden {
+                if self.searchBar.isHidden { // show
                     view.bringSubview(toFront: self.searchBar)
                     self.searchBar.isHidden = false
                     UIView.animate(withDuration: 0.3, animations: {
@@ -385,12 +385,12 @@ extension CAPSPageMenu {
                         topConstraint.constant = topConstraint.constant + 44
                         self.view.layoutIfNeeded()
                     }){ _ in self.controllerScrollView.bounces = false; self.controllerScrollView.alwaysBounceHorizontal = false; self.controllerScrollView.alwaysBounceVertical = false }
-                } else {
+                } else { // hide
                     UIView.animate(withDuration: 0.3, animations: {
                         searchConstraint.constant = 0
                         topConstraint.constant = topConstraint.constant - 44
                         self.view.layoutIfNeeded()
-                    }) { _ in self.searchBar.isHidden = true }
+                    }) { _ in self.searchBar.isHidden = true; self.searchBar.resignFirstResponder() }
                 }
 
             }
